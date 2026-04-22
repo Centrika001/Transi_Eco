@@ -93,9 +93,9 @@ function Intro() {
           Enviar dinero <em style={{ fontStyle: 'normal', color: 'var(--oro)' }}>a casa</em><br />
           no debería <em style={{ fontStyle: 'normal', color: 'var(--azul)' }}>ser un lío</em>.
         </h1>
-        <p className="lead" style={{ marginTop: 40, fontSize: 22 }}>
-          Transi conecta a la diáspora dominicana en Estados Unidos con familiares en RD a través de un ecosistema completo:
-          desde el envío hasta seis formas de cobro, incluyendo tres canales nuevos hechos para el dominicano de hoy.
+        <p className="lead" style={{ marginTop: 40, fontSize: 22 }}>Transi conecta a la diáspora dominicana en Estados Unidos con familiares en RD a través de un ecosistema completo: desde el envío hasta múltiples formas de cobro, incluyendo tres canales nuevos diseñados para el dominicano de hoy.
+
+
         </p>
 
         <div className="hero-meta">
@@ -740,8 +740,8 @@ function Cierre() {
           Transi te da opciones pa' que el dinero llegue como tu gente lo necesite.
         </p>
         <div style={{ marginTop: 56, display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a className="btn" href="#intro">↑ Volver al inicio</a>
-          <a className="btn ghost" href="#ecosistema">Ver el ecosistema</a>
+          <button className="btn" onClick={() => window.__transiGoTo && window.__transiGoTo(0)}>↑ Volver al inicio</button>
+          <button className="btn ghost" onClick={() => window.__transiGoTo && window.__transiGoTo(1)}>Ver el ecosistema</button>
         </div>
         <div style={{ marginTop: 96, paddingTop: 32, borderTop: '1px solid var(--rule)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--ink-3)', letterSpacing: '0.08em' }}>
           <span>TRANSI · ECOSISTEMA DE REMESAS</span>
@@ -811,6 +811,11 @@ function Deck({ slides }) {
       return Math.max(0, Math.min(slides.length - 1, n));
     });
   };
+
+  useEffectMain(() => {
+    window.__transiGoTo = goTo;
+    return () => { delete window.__transiGoTo; };
+  }, []);
 
   useEffectMain(() => {
     const onKey = (e) => {
