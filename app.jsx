@@ -793,6 +793,7 @@ function Deck({ slides }) {
   })();
   const [idx, setIdx] = useStateMain(initial);
   const [dir, setDir] = useStateMain(1);
+  const [menuOpen, setMenuOpen] = useStateMain(false);
 
   useEffectMain(() => {
     try {localStorage.setItem(STORAGE_KEY, String(idx));} catch (e) {}
@@ -806,6 +807,7 @@ function Deck({ slides }) {
     });
   };
   const goTo = (n) => {
+    setMenuOpen(false);
     setIdx((i) => {
       setDir(n >= i ? 1 : -1);
       return Math.max(0, Math.min(slides.length - 1, n));
@@ -820,6 +822,7 @@ function Deck({ slides }) {
   useEffectMain(() => {
     const onKey = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'Escape') { setMenuOpen(false); return; }
       if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {e.preventDefault();go(1);}
       if (e.key === 'ArrowLeft' || e.key === 'PageUp') {e.preventDefault();go(-1);}
       if (e.key === 'Home') {e.preventDefault();goTo(0);}
@@ -834,17 +837,71 @@ function Deck({ slides }) {
 
   return (
     <div className="deck">
-      <div className="deck-topbar">
-        <div className="brand">
-          <img className="logo" src="assets/logo.jpg" alt="Transi Remesas" style={{ height: 26 }} />
-          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: '0.15em', color: 'var(--ink-3)', textTransform: 'uppercase', marginLeft: 4 }}>· Ecosistema</span>
+      {/* Side nav overlay */}
+      {menuOpen && (
+        <div
+          onClick={() => setMenuOpen(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(14,17,22,0.45)', zIndex: 200, backdropFilter: 'blur(2px)' }}
+        />
+      )}
+
+      {/* Side menu panel */}
+      <div style={{
+        position: 'fixed', top: 0, left: 0, bottom: 0, width: 300,
+        background: 'var(--paper)', borderRight: '1px solid var(--rule)',
+        zIndex: 210, display: 'flex', flexDirection: 'column',
+        transform: menuOpen ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform 320ms cubic-bezier(.22,.61,.36,1)',
+        boxShadow: menuOpen ? '8px 0 40px -10px rgba(14,17,22,0.18)' : 'none',
+      }}>
+        {/* Panel header */}
+        <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid var(--rule)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <img src="assets/logo.jpg" alt="Transi" style={{ height: 28, width: 'auto' }} />
+          <button onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: 'var(--ink-3)', padding: '4px 8px', borderRadius: 4 }}>✕</button>
         </div>
-        <div className="deck-dots">
-          {slides.map((s, i) =>
-          <button key={i} onClick={() => goTo(i)} className={`dot ${i === idx ? 'active' : ''}`} aria-label={`Ir a ${s.label}`}>
-              <span className="n">{String(i).padStart(2, '0')}</span>
+        {/* Slide list */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 0' }}>
+          {slides.map((s, i) => (
+            <button
+              key={i}
+              onClick={() => goTo(i)}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+                padding: '12px 20px', border: 'none', background: i === idx ? 'var(--paper-2)' : 'transparent',
+                cursor: 'pointer', textAlign: 'left', borderLeft: i === idx ? '3px solid var(--oro)' : '3px solid transparent',
+                transition: 'all 200ms',
+              }}
+            >
+              <span style={{ fontSize: 20, flexShrink: 0, width: 28, textAlign: 'center' }}>{s.icon}</span>
+              <div>
+                <div style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 14, fontWeight: i === idx ? 600 : 400, letterSpacing: '-0.01em', color: i === idx ? 'var(--ink)' : 'var(--ink-2)' }}>{s.label}</div>
+                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'var(--ink-4)', letterSpacing: '0.08em', marginTop: 2 }}>{String(i + 1).padStart(2,'0')} · {s.sub}</div>
+              </div>
             </button>
-          )}
+          ))}
+        </div>
+        {/* Footer */}
+        <div style={{ padding: '16px 20px', borderTop: '1px solid var(--rule)', fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'var(--ink-4)', letterSpacing: '0.1em' }}>
+          TRANSI · ECOSISTEMA · 2026
+        </div>
+      </div>
+
+      <div className="deck-topbar">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          {/* Hamburger menu button */}
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            style={{ background: 'none', border: '1px solid var(--rule-2)', borderRadius: 6, padding: '7px 10px', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4, flexShrink: 0 }}
+            aria-label="Menú de navegación"
+          >
+            <span style={{ display: 'block', width: 18, height: 1.5, background: 'var(--ink-2)', borderRadius: 1 }}></span>
+            <span style={{ display: 'block', width: 14, height: 1.5, background: 'var(--ink-2)', borderRadius: 1 }}></span>
+            <span style={{ display: 'block', width: 18, height: 1.5, background: 'var(--ink-2)', borderRadius: 1 }}></span>
+          </button>
+          <div className="brand">
+            <img className="logo" src="assets/logo.jpg" alt="Transi Remesas" style={{ height: 26 }} />
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: '0.15em', color: 'var(--ink-3)', textTransform: 'uppercase', marginLeft: 4 }}>· Ecosistema</span>
+          </div>
         </div>
         <div className="deck-counter">
           <span className="num">{String(idx + 1).padStart(2, '0')}</span>
@@ -889,17 +946,17 @@ function Deck({ slides }) {
 }
 
 const SLIDES = [
-{ label: 'Introducción', component: Intro },
-{ label: 'El Ecosistema', component: Ecosistema },
-{ label: 'Origen del Envío', component: Origen },
-{ label: 'Retiro en Efectivo', component: Retiro },
-{ label: 'Puntos Transi', component: Puntos },
-{ label: 'Depósito Bancario', component: Banco },
-{ label: 'Entrega a Domicilio', component: Domicilio },
-{ label: 'Pago por WhatsApp', component: WhatsappSection },
-{ label: 'Transi Wallet', component: WalletSection },
-{ label: 'Comparativa', component: Comparativa },
-{ label: 'Cierre', component: Cierre }];
+{ label: 'Introducción',      icon: '🏠', sub: 'Bienvenida',             component: Intro },
+{ label: 'El Ecosistema',     icon: '🗺️', sub: 'Mapa de canales',        component: Ecosistema },
+{ label: 'Origen del Envío',  icon: '💳', sub: 'Cómo fondear',           component: Origen },
+{ label: 'Retiro en Efectivo',icon: '🏦', sub: 'Canal 01',               component: Retiro },
+{ label: 'Puntos Transi',     icon: '📍', sub: 'Canal 02',               component: Puntos },
+{ label: 'Depósito Bancario', icon: '🏛️', sub: 'Canal 03',               component: Banco },
+{ label: 'Entrega a Domicilio',icon:'🏍️', sub: 'Canal 04',               component: Domicilio },
+{ label: 'Pago por WhatsApp', icon: '💬', sub: 'Canal 05 · Innovación',  component: WhatsappSection },
+{ label: 'Transi Wallet',     icon: '💳', sub: 'Canal 06 · Innovación',  component: WalletSection },
+{ label: 'Comparativa',       icon: '📊', sub: 'Resumen canales',        component: Comparativa },
+{ label: 'Cierre',            icon: '🎯', sub: 'Conclusión',             component: Cierre }];
 
 
 function App() {
