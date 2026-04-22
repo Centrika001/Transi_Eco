@@ -881,7 +881,26 @@ function Deck({ slides }) {
           ))}
         </div>
         {/* Footer */}
-        <div style={{ padding: '16px 20px', borderTop: '1px solid var(--rule)', fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'var(--ink-4)', letterSpacing: '0.1em' }}>
+        <div style={{ padding: '12px 0', borderTop: '1px solid var(--rule)' }}>
+          <a
+            href="https://centrika001.github.io/Transi/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+              padding: '12px 20px', border: 'none', background: 'transparent',
+              cursor: 'pointer', textAlign: 'left', borderLeft: '3px solid transparent',
+              textDecoration: 'none', transition: 'all 200ms',
+            }}
+          >
+            <span style={{ fontSize: 20, flexShrink: 0, width: 28, textAlign: 'center' }}>🎁</span>
+            <div>
+              <div style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 14, fontWeight: 400, letterSpacing: '-0.01em', color: 'var(--ink-2)' }}>Estímulos</div>
+              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'var(--ink-4)', letterSpacing: '0.08em', marginTop: 2 }}>VER SITIO →</div>
+            </div>
+          </a>
+        </div>
+        <div style={{ padding: '12px 20px', borderTop: '1px solid var(--rule)', fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'var(--ink-4)', letterSpacing: '0.1em' }}>
           TRANSI · ECOSISTEMA · 2026
         </div>
       </div>
