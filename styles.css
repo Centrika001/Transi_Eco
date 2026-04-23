@@ -204,8 +204,8 @@ body {
 .deck-canvas .split { gap: 48px; }
 /* Channel slides: align sides & adjust proportions */
 .deck-canvas > .section[id="whatsapp"] { padding: 28px 64px; overflow: hidden; box-sizing: border-box; }
-.deck-canvas > .section[id="whatsapp"] .wa-frame { max-height: 100%; aspect-ratio: auto; }
-.deck-canvas > .section[id="whatsapp"] .wa-body { flex: 1; min-height: 0; }
+.deck-canvas > .section[id="whatsapp"] .wa-frame { height: 100%; max-height: none; max-width: none; width: 100%; aspect-ratio: auto; }
+.deck-canvas > .section[id="whatsapp"] .wa-body { flex: 1; min-height: 0; overflow-y: auto; }
 .deck-canvas > .section[id="whatsapp"] .app-phone-col { max-height: 100%; }
 .deck-canvas > .section[id="ecosistema"] { padding: 48px 64px; }
 .deck-canvas > .section[id="wallet"] { padding: 56px 72px; }
