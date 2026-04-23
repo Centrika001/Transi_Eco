@@ -593,51 +593,160 @@ function Domicilio() {
 
 }
 
+function AppScreenshot() {
+  const [fullscreen, setFullscreen] = useStateMain(false);
+  useEffectMain(() => {
+    const onKey = (e) => { if (e.key === 'Escape') setFullscreen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const btnStyle = {
+    background: 'rgba(255,255,255,0.12)', color: '#fff', border: 'none',
+    padding: '5px 12px', borderRadius: 999,
+    fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+    letterSpacing: '0.1em', cursor: 'pointer', transition: 'all 200ms',
+  };
+
+  const phoneFrame = (size = 'normal') => {
+    const isLarge = size === 'large';
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        height: '100%', minHeight: 0,
+      }}>
+        {/* Fullscreen button above frame — only in normal mode */}
+        {!isLarge && (
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginBottom: 6, flexShrink: 0 }}>
+            <button data-interactive onClick={() => setFullscreen(f => !f)} style={btnStyle}>
+              {fullscreen ? '✕ SALIR' : '⛶ PANTALLA COMPLETA'}
+            </button>
+          </div>
+        )}
+        {/* Phone shell */}
+        <div style={{
+          flex: 1, minHeight: 0,
+          background: '#1A1A1A', borderRadius: isLarge ? 40 : 28,
+          padding: isLarge ? '14px 10px' : '10px 7px',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+          display: 'flex', flexDirection: 'column',
+          width: '100%', maxWidth: isLarge ? 420 : 260,
+          margin: '0 auto',
+          boxSizing: 'border-box',
+        }}>
+          {/* Notch */}
+          <div style={{ height: isLarge ? 14 : 10, display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: isLarge ? 6 : 4, flexShrink: 0 }}>
+            <div style={{ width: isLarge ? 80 : 56, height: isLarge ? 7 : 5, background: '#333', borderRadius: 99 }}></div>
+          </div>
+          {/* Screen */}
+          <div style={{ flex: 1, minHeight: 0, borderRadius: isLarge ? 28 : 20, overflow: 'hidden', background: '#fff' }}>
+            <img src="assets/app-screenshot.png" alt="Transi App" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
+          </div>
+          {/* Home bar */}
+          <div style={{ height: isLarge ? 12 : 8, display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: isLarge ? 6 : 4, flexShrink: 0 }}>
+            <div style={{ width: isLarge ? 80 : 56, height: 3, background: '#444', borderRadius: 99 }}></div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {fullscreen && (
+        <div data-interactive style={{
+          position:'fixed', inset:0, zIndex:9999, background:'#0E1116',
+          display:'flex', alignItems:'center', justifyContent:'center',
+        }}>
+          {/* SALIR button — fixed top-right */}
+          <button
+            data-interactive
+            onClick={() => setFullscreen(false)}
+            style={{
+              position: 'absolute', top: 20, right: 28,
+              background:'rgba(255,255,255,0.12)', border:'none', color:'#fff',
+              padding:'8px 18px', borderRadius:999,
+              fontFamily:'JetBrains Mono, monospace', fontSize:11,
+              letterSpacing:'0.1em', cursor:'pointer', zIndex:1,
+            }}
+          >✕ SALIR</button>
+          {/* Label top-left */}
+          <div style={{
+            position:'absolute', top:24, left:28,
+            fontFamily:'JetBrains Mono, monospace', fontSize:11,
+            color:'rgba(255,255,255,0.3)', letterSpacing:'0.15em',
+          }}>TRANSI APP · SELECCIÓN DE CANAL · USA</div>
+          {/* Phone — full viewport height */}
+          <div style={{ height: '100vh', aspectRatio: '9/19.5', maxWidth: '100vw', padding: '16px 0', boxSizing: 'border-box' }}>
+            {phoneFrame('large')}
+          </div>
+        </div>
+      )}
+      <div style={{ height: '100%', minHeight: 0, display: fullscreen ? 'none' : 'flex', flexDirection: 'column' }}>
+        {phoneFrame('normal')}
+      </div>
+    </>
+  );
+}
+
 function WhatsappSection() {
   return (
     <section id="whatsapp" className="section" data-screen-label="07 WhatsApp AI" style={{ background: '#0E1116', color: 'var(--paper)' }}>
-      <div className="container" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 360px', gap: 40, alignItems: 'center', height: '100%' }}>
-        <div>
-          <img src="assets/whatsapp.png" alt="WhatsApp" style={{ display: 'block', width: 56, height: 56, marginBottom: 20 }} />
-          <div className="eyebrow red" style={{ color: '#D4A84B' }}>Canal 05 · Innovación Transi</div>
-          <h2 className="display" style={{ marginTop: 16, marginBottom: 20, color: 'var(--paper)', fontSize: 54, lineHeight: 1.15 }}>
-            Pago Asistido por WhatsApp.<br />
-            <em style={{ fontStyle: 'normal', color: '#D4A84B' }}>Tu asistente habla dominicano.</em>
-          </h2>
-          <p style={{ color: '#BFC3CA', fontSize: 15, lineHeight: 1.5, maxWidth: '46ch' }}>El asistente de IA valida la identidad en el chat, sugiere el punto de pago más cercano y entrega un código de 6 dígitos (OTP) para retirar sin tarjeta, sin filas.
+      <div className="container" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 16, overflow: 'hidden' }}>
 
-
-          </p>
-          <div style={{ marginTop: 24, fontFamily: 'JetBrains Mono, monospace', fontSize: 60, letterSpacing: '-0.03em', color: '#2A2E35', lineHeight: 1 }}>07</div>
+        {/* Top: title row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 32, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <img src="assets/whatsapp.png" alt="WhatsApp" style={{ display: 'block', width: 36, height: 36, flexShrink: 0 }} />
+            <div>
+              <div className="eyebrow red" style={{ color: '#D4A84B', marginBottom: 4 }}>Canal 05 · Innovación Transi</div>
+              <h2 className="display" style={{ color: 'var(--paper)', fontSize: 32, lineHeight: 1.1, margin: 0 }}>
+                Pago Asistido por WhatsApp · <em style={{ fontStyle: 'normal', color: '#D4A84B' }}>Tu asistente habla dominicano.</em>
+              </h2>
+            </div>
+          </div>
+          <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 48, letterSpacing: '-0.03em', color: '#2A2E35', lineHeight: 1, flexShrink: 0 }}>07</div>
         </div>
 
-        <div>
-          <div className="eyebrow" style={{ color: '#D4A84B' }}>¿Cómo funciona?</div>
-          <ol style={{ listStyle: 'none', marginTop: 20 }}>
-            {[
-            ['Aviso por WhatsApp', 'El destinatario recibe un mensaje anunciando la transferencia.'],
-            ['Chat en dominicano', 'Lingo local. Nada robótico, nada frío.'],
-            ['Validación KYC', 'Cédula + verificación, todo en el chat.'],
-            ['Elige punto de retiro', 'Puntos Transi, cajeros sin tarjeta, bancos o agencias.'],
-            ['Código de 6 dígitos (OTP)', '6 dígitos, válido para un solo uso y sin filas.']].
-            map(([t, d], i) =>
-            <li key={i} style={{ padding: '10px 0', borderTop: '1px solid #2A2E35', display: 'grid', gridTemplateColumns: '32px 1fr', gap: 12 }}>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#D4A84B' }}>0{i + 1}</span>
-                <div>
-                  <div style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 16, letterSpacing: '-0.01em', marginBottom: 2 }}>{t}</div>
-                  <div style={{ color: '#9AA0AA', fontSize: 12.5, lineHeight: 1.45 }}>{d}</div>
-                </div>
-              </li>
-            )}
-          </ol>
+        {/* Bottom: 3 columns — fill remaining height */}
+        <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 28, alignItems: 'stretch', overflow: 'hidden' }}>
+
+          {/* Col 1: App screenshot */}
+          <div className="app-phone-col" style={{ minHeight: 0, overflow: 'hidden' }}>
+            <AppScreenshot />
+          </div>
+
+          {/* Col 2: Cómo funciona */}
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'hidden' }}>
+            <div className="eyebrow" style={{ color: '#D4A84B', marginBottom: 12 }}>¿Cómo funciona?</div>
+            <ol style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+              {[
+                ['Aviso por WhatsApp', 'El destinatario recibe un mensaje anunciando la transferencia.'],
+                ['Chat en dominicano', 'Lingo local. Nada robótico, nada frío.'],
+                ['Validación KYC', 'Cédula + verificación, todo en el chat.'],
+                ['Elige punto de retiro', 'Puntos Transi, cajeros sin tarjeta, bancos o agencias.'],
+                ['Código de 6 dígitos (OTP)', '6 dígitos, válido para un solo uso y sin filas.'],
+              ].map(([t, d], i) =>
+                <li key={i} style={{ padding: '8px 0', borderTop: '1px solid #2A2E35', display: 'grid', gridTemplateColumns: '28px 1fr', gap: 10 }}>
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#D4A84B' }}>0{i + 1}</span>
+                  <div>
+                    <div style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 14, letterSpacing: '-0.01em', marginBottom: 2 }}>{t}</div>
+                    <div style={{ color: '#9AA0AA', fontSize: 11.5, lineHeight: 1.4 }}>{d}</div>
+                  </div>
+                </li>
+              )}
+            </ol>
+          </div>
+
+          {/* Col 3: WhatsApp chat */}
+          <div style={{ minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <WhatsappChat />
+          </div>
         </div>
 
-        <div>
-          <WhatsappChat />
-        </div>
       </div>
-    </section>);
-
+    </section>
+  );
 }
 
 function WalletSection() {
@@ -972,7 +1081,7 @@ const SLIDES = [
 { label: 'Puntos Transi',     icon: '📍', sub: 'Canal 02',               component: Puntos },
 { label: 'Depósito Bancario', icon: '🏛️', sub: 'Canal 03',               component: Banco },
 { label: 'Entrega a Domicilio',icon:'🏍️', sub: 'Canal 04',               component: Domicilio },
-{ label: 'Pago por WhatsApp', icon: '💬', sub: 'Canal 05 · Innovación',  component: WhatsappSection },
+{ label: 'Pago Asistido por WhatsApp', icon: '💬', sub: 'Canal 05 · Innovación',  component: WhatsappSection },
 { label: 'Transi Wallet',     icon: '💳', sub: 'Canal 06 · Innovación',  component: WalletSection },
 { label: 'Comparativa',       icon: '📊', sub: 'Resumen canales',        component: Comparativa },
 { label: 'Cierre',            icon: '🎯', sub: 'Conclusión',             component: Cierre }];
