@@ -970,24 +970,34 @@ function Deck({ slides }) {
         </div>
         {/* Slide list */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '12px 0' }}>
-          {slides.map((s, i) => (
-            <button
-              key={i}
-              onClick={() => goTo(i)}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 14,
-                padding: '12px 20px', border: 'none', background: i === idx ? 'var(--paper-2)' : 'transparent',
-                cursor: 'pointer', textAlign: 'left', borderLeft: i === idx ? '3px solid var(--oro)' : '3px solid transparent',
-                transition: 'all 200ms',
-              }}
-            >
-              <span style={{ fontSize: 20, flexShrink: 0, width: 28, textAlign: 'center' }}>{s.icon}</span>
-              <div>
-                <div style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 14, fontWeight: i === idx ? 600 : 400, letterSpacing: '-0.01em', color: i === idx ? 'var(--ink)' : 'var(--ink-2)' }}>{s.label}</div>
-                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'var(--ink-4)', letterSpacing: '0.08em', marginTop: 2 }}>{String(i + 1).padStart(2,'0')} · {s.sub}</div>
-              </div>
-            </button>
-          ))}
+          {(() => {
+            // Menu order: WhatsApp moved to position 3 (visual only — nav uses original index)
+            const waIdx = slides.findIndex(s => s.component === WhatsappSection);
+            const menuOrder = [...slides];
+            const [waSlide] = menuOrder.splice(waIdx, 1);
+            menuOrder.splice(2, 0, waSlide);
+            return menuOrder.map((s) => {
+              const origIdx = slides.indexOf(s);
+              return (
+                <button
+                  key={origIdx}
+                  onClick={() => goTo(origIdx)}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+                    padding: '12px 20px', border: 'none', background: origIdx === idx ? 'var(--paper-2)' : 'transparent',
+                    cursor: 'pointer', textAlign: 'left', borderLeft: origIdx === idx ? '3px solid var(--oro)' : '3px solid transparent',
+                    transition: 'all 200ms',
+                  }}
+                >
+                  <span style={{ fontSize: 20, flexShrink: 0, width: 28, textAlign: 'center' }}>{s.icon}</span>
+                  <div>
+                    <div style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 14, fontWeight: origIdx === idx ? 600 : 400, letterSpacing: '-0.01em', color: origIdx === idx ? 'var(--ink)' : 'var(--ink-2)' }}>{s.label}</div>
+                    <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'var(--ink-4)', letterSpacing: '0.08em', marginTop: 2 }}>{String(origIdx + 1).padStart(2,'0')} · {s.sub}</div>
+                  </div>
+                </button>
+              );
+            });
+          })()}
         </div>
         {/* Footer */}
         <div style={{ padding: '12px 0', borderTop: '1px solid var(--rule)' }}>
