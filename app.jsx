@@ -711,9 +711,9 @@ function WhatsappSection() {
         {/* Bottom: 3 columns — fill remaining height */}
         <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 28, alignItems: 'stretch', overflow: 'hidden' }}>
 
-          {/* Col 1: App screenshot */}
-          <div className="app-phone-col" style={{ minHeight: 0, overflow: 'hidden' }}>
-            <AppScreenshot />
+          {/* Col 1: WhatsApp services & products */}
+          <div style={{ minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <WhatsappServices />
           </div>
 
           {/* Col 2: Cómo funciona */}

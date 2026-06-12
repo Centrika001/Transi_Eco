@@ -94,8 +94,8 @@ const SCRIPT = [
   { who:'bot', text:'Cualquier cosa me escribe\', ¡que Dios te bendiga! 🇩🇴', delay:1200, typing:800 },
 ];
 
-// Shared chat UI — used both inline and in fullscreen
-function ChatUI({ visible, typing, paused, setPaused, bodyRef, formatTime, fullscreen, setFullscreen }) {
+// Shared chat UI — used both inline and in fullscreen. `script` lets it drive any conversation.
+function ChatUI({ visible, typing, paused, setPaused, bodyRef, formatTime, fullscreen, setFullscreen, script = SCRIPT }) {
   return (
     <div className="wa-frame" style={fullscreen ? {height:'100%', maxWidth:'none', width:'100%', aspectRatio:'auto', borderRadius:12} : {}}>
       <div className="wa-header">
@@ -129,7 +129,7 @@ function ChatUI({ visible, typing, paused, setPaused, bodyRef, formatTime, fulls
         </div>
       </div>
       <div className="wa-body" ref={bodyRef}>
-        {SCRIPT.map((msg, i) => {
+        {script.map((msg, i) => {
           if (!visible.includes(i)) return null;
           return (
             <div key={i} className={`wa-msg ${msg.who}`}>
@@ -139,8 +139,63 @@ function ChatUI({ visible, typing, paused, setPaused, bodyRef, formatTime, fulls
                   <CedulaBack />
                   <div style={{fontSize:11, color:'var(--ink-4)', marginTop:4}}>cedula_frente.jpg · cedula_dorso.jpg</div>
                 </div>
+              ) : msg.invoice ? (
+                <div>
+                  <div style={{
+                    width:158, background:'#fff', borderRadius:6, overflow:'hidden',
+                    boxShadow:'0 4px 14px rgba(0,0,0,0.22)', transform:'rotate(-1.6deg)',
+                  }}>
+                    <div style={{
+                      background:'#E2231A', color:'#fff', padding:'7px 9px',
+                      display:'flex', alignItems:'center', justifyContent:'space-between',
+                    }}>
+                      <span style={{ fontFamily:'Space Grotesk, sans-serif', fontWeight:700, fontSize:14, letterSpacing:'0.02em' }}>EDESUR</span>
+                      <span style={{ fontSize:6.5, opacity:0.9, letterSpacing:'0.08em' }}>FACTURA DE ENERGÍA</span>
+                    </div>
+                    <div style={{ padding:'9px 10px', color:'#1A1A1A' }}>
+                      {[['Cliente','MARÍA A. RODRÍGUEZ'],['NIC','7785421'],['Período','MAYO 2026'],['Consumo','312 kWh']].map((r,k) => (
+                        <div key={k} style={{ display:'flex', justifyContent:'space-between', gap:8, fontSize:8, padding:'1.5px 0', borderBottom:'1px solid #F0F0F0' }}>
+                          <span style={{ color:'#8A8A8A' }}>{r[0]}</span>
+                          <span style={{ fontWeight:600 }}>{r[1]}</span>
+                        </div>
+                      ))}
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginTop:6 }}>
+                        <span style={{ fontSize:8, color:'#8A8A8A' }}>TOTAL A PAGAR</span>
+                        <span style={{ fontFamily:'JetBrains Mono, monospace', fontWeight:700, fontSize:13, color:'#E2231A' }}>RD$ 1,340</span>
+                      </div>
+                      <div style={{ display:'flex', gap:1, alignItems:'flex-end', height:18, marginTop:7 }}>
+                        {Array.from({length:34}).map((_,b) => (
+                          <span key={b} style={{ flex:1, height:'100%', background:(b%3===0?'#1A1A1A':b%2===0?'#fff':'#1A1A1A') }}></span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{fontSize:11, color:'var(--ink-4)', marginTop:5}}>factura_edesur.jpg</div>
+                </div>
               ) : (
                 <div style={{whiteSpace:'pre-line'}}>{msg.text}</div>
+              )}
+              {msg.receipt && (
+                <div style={{
+                  marginTop:8, background:'var(--paper-2)',
+                  border:'1px solid rgba(0,0,0,0.08)', borderRadius:8,
+                  padding:'10px 12px', minWidth:180,
+                }}>
+                  <div style={{
+                    fontFamily:'JetBrains Mono, monospace', fontSize:10,
+                    letterSpacing:'0.12em', color:'var(--wa-ink)', marginBottom:8,
+                    display:'flex', justifyContent:'space-between', alignItems:'center',
+                  }}>
+                    <span>{msg.receipt.title}</span>
+                    <span style={{ color:'#1FA855' }}>✓</span>
+                  </div>
+                  {msg.receipt.rows.map((r, k) => (
+                    <div key={k} style={{ display:'flex', justifyContent:'space-between', gap:16, fontSize:12, padding:'2px 0' }}>
+                      <span style={{ color:'var(--ink-4)' }}>{r[0]}</span>
+                      <span style={{ fontFamily:'JetBrains Mono, monospace', fontWeight:600 }}>{r[1]}</span>
+                    </div>
+                  ))}
+                </div>
               )}
               {msg.otp && <div className="otp">{msg.otp}</div>}
               {msg.options && (
@@ -171,7 +226,7 @@ function ChatUI({ visible, typing, paused, setPaused, bodyRef, formatTime, fulls
   );
 }
 
-function WhatsappChat() {
+function WhatsappAnimation({ script = SCRIPT, fsLabel = 'TRANSI · ASISTENTE · CANAL 05' }) {
   const [visible, setVisible]   = useState([]);
   const [typing, setTyping]     = useState(false);
   const [paused, setPaused]     = useState(false);
@@ -204,7 +259,7 @@ function WhatsappChat() {
     const speedVar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--anim-speed')) || 1;
     const mult = 1 / speedVar;
     let elapsed = 400 * mult;
-    SCRIPT.forEach((msg, i) => {
+    script.forEach((msg, i) => {
       if (msg.who === 'bot' && msg.typing) {
         timerRef.current.push(setTimeout(() => setTyping(true), elapsed));
         elapsed += msg.typing * mult;
@@ -221,7 +276,7 @@ function WhatsappChat() {
     if (paused) {
       clearTimers();
       setTyping(false);
-      setVisible(SCRIPT.map((_, i) => i));
+      setVisible(script.map((_, i) => i));
     } else {
       play();
     }
@@ -237,7 +292,7 @@ function WhatsappChat() {
     return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
   };
 
-  const sharedProps = { visible, typing, paused, setPaused, bodyRef, formatTime, fullscreen, setFullscreen };
+  const sharedProps = { visible, typing, paused, setPaused, bodyRef, formatTime, fullscreen, setFullscreen, script };
 
   return (
     <>
@@ -253,7 +308,7 @@ function WhatsappChat() {
             fontFamily:'JetBrains Mono, monospace', fontSize:11,
             color:'rgba(255,255,255,0.3)', letterSpacing:'0.15em',
           }}>
-            TRANSI · PAGO ASISTIDO POR WHATSAPP · CANAL 05
+            {fsLabel}
           </div>
           {/* Centered phone — tall and wide in fullscreen */}
           <div style={{width:'50%', height:'100%', display:'flex', flexDirection:'column'}}>
@@ -269,4 +324,8 @@ function WhatsappChat() {
   );
 }
 
-Object.assign(window, { WhatsappChat });
+function WhatsappChat() {
+  return <WhatsappAnimation script={SCRIPT} fsLabel="TRANSI · PAGO ASISTIDO POR WHATSAPP · CANAL 05" />;
+}
+
+Object.assign(window, { WhatsappChat, WhatsappAnimation, ChatUI });
